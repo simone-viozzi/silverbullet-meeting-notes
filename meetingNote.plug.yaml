@@ -1,0 +1,6 @@
+name: meetingNote
+functions:
+  meetingNote:
+    path: meetingNote.ts:meetingNote
+    command:
+      name: "New Meeting Note"
