@@ -55,12 +55,17 @@ export async function getPlugConfig(): Promise<TreeViewConfig> {
   }
 }
 
-// Utility to sanitize and format the title
 function sanitizeTitle(title: string): string {
-  return title
-    .replace(/[^\w\s-]/g, " ")
-    .replace(/[\s-]+/g, " ")
-    .trim();
+  // Remove any special character except for '-', replace with space
+  let sanitized = title.replace(/[^\w\s-]/g, " ");
+  
+  // Remove repeated spaces and dashes, replace with a single instance of each
+  sanitized = sanitized.replace(/[\s-]+/g, m => m.includes('-') ? '-' : ' ');
+
+  // Trim surrounding spaces and dashes
+  sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, '');
+
+  return sanitized;
 }
 
 // Utility to format date to the desired string format
