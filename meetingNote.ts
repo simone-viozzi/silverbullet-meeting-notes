@@ -10,16 +10,26 @@ dayjs.extend(isToday);
 
 export const PLUG_NAME = "meetingNote";
 
-// Define the configuration schema with only the meetingNoteTemplatePath setting
-const treeViewConfigSchema = z.object({
+
+/**
+ * Represents the configuration schema for a meeting note.
+ */
+const meetingNoteConfigSchema = z.object({
   meetingNoteTemplatePath: z.string().optional(),
   meetingNoteBasePath: z.string().optional(),
 });
 
-export type TreeViewConfig = z.infer<typeof treeViewConfigSchema>;
+export type MeetingNoteConfig = z.infer<typeof meetingNoteConfigSchema>;
 
 let configErrorShown = false;
 
+/**
+ * Displays a notification with an error message related to the configuration.
+ * If the error is an instance of ZodError, it extracts and displays the specific field errors.
+ * 
+ * @param error - The error object to display in the notification.
+ * @returns A Promise that resolves when the notification is displayed.
+ */
 async function showConfigErrorNotification(error: unknown) {
   if (configErrorShown) {
     return;
@@ -43,32 +53,37 @@ async function showConfigErrorNotification(error: unknown) {
   );
 }
 
-export async function getPlugConfig(): Promise<TreeViewConfig> {
+export async function getPlugConfig(): Promise<MeetingNoteConfig> {
   const userConfig = await readSetting(PLUG_NAME);
 
   try {
-    return treeViewConfigSchema.parse(userConfig || {});
+    return meetingNoteConfigSchema.parse(userConfig || {});
   } catch (error) {
     await showConfigErrorNotification(error);
     // Fallback to the default configuration if parsing fails
-    return treeViewConfigSchema.parse({});
+    return meetingNoteConfigSchema.parse({});
   }
 }
 
+/**
+ * Sanitizes the given title by removing special characters and extra spaces.
+ * 
+ * @param title - The title to be sanitized.
+ * @returns The sanitized title.
+ */
 function sanitizeTitle(title: string): string {
-  // Remove any special character except for '-', replace with space
   let sanitized = title.replace(/[^\w\s-]/g, " ");
-  
-  // Remove repeated spaces and dashes, replace with a single instance of each
   sanitized = sanitized.replace(/[\s-]+/g, m => m.includes('-') ? '-' : ' ');
-
-  // Trim surrounding spaces and dashes
   sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, '');
 
   return sanitized;
 }
 
-// Utility to format date to the desired string format
+/**
+ * Formats a timestamp into a string with the format "YYYY-MM-DD_HH-mm".
+ * @param date - The timestamp to format.
+ * @returns The formatted timestamp string.
+ */
 function formatTimestamp(date: dayjs.Dayjs): string {
   return date.format("YYYY-MM-DD_HH-mm");
 }
@@ -94,6 +109,15 @@ const formats = [
   "HH",
 ];
 
+/**
+ * Preprocesses a date string by separating the day and time components and formatting them.
+ * If the date string includes a day component, it is separated from the time component and padded if necessary.
+ * The time component is processed by splitting it into parts and padding each part if necessary.
+ * The day and time components are then rejoined and returned as a formatted date string.
+ *
+ * @param dateStr - The date string to preprocess.
+ * @returns The preprocessed and formatted date string.
+ */
 function preprocessDateStr(dateStr: string): string {
   // First, identify if the format includes a day component by checking for an underscore
   const hasDayComponent = dateStr.includes("_");
@@ -125,6 +149,39 @@ function preprocessDateStr(dateStr: string): string {
   return dayPart + processedTimePart;
 }
 
+/**
+ * Parses a date string using multiple formats and returns a `dayjs` object representing the parsed date.
+ * If the date string cannot be parsed using any of the formats, `undefined` is returned.
+ *
+ * The logic of parsing involves iterating through each format in the `formats` array and attempting to parse the date string using `dayjs`.
+ * If the parsing is successful, the parsed date is returned.
+ * If the format includes a day component, the parsed date is checked against the current date and adjusted if necessary.
+ * If the parsed time is less than 30 minutes before the current time, the parsed date is adjusted to the next day.
+ * If the parsed day is before the current day, the parsed date is adjusted to the next month.
+ * 
+ * Examples with today as 2024-03-27 10:00:
+ * - parseDateWithFormats("10:20") => 2024-03-27 10:20
+ *     This example represents a time without a day component. 
+ *     The parsed date will have the same day as the current date (2024-03-27) and the specified time (10:20).
+ * - parseDateWithFormats("9") => 2024-03-28 09:00
+ *   This example represents a time without a day component. 
+ *     The parsed date will have the next day (2024-03-28) and the specified time (09:00) 
+ *     since it is less than 30 minutes before the current time (10:00).
+ * - parseDateWithFormats("10") => 2024-03-27 10:00
+ *     This example represents a time without a day component. 
+ *     The parsed date will have the same day as the current date (2024-03-27) and the specified time (10:00).
+ * - parseDateWithFormats("30_10") => 2024-03-30 10:00
+ *   This example represents a date with a day component. 
+ *     The parsed date will have the specified day (30) and time (10:00).
+ * - parseDateWithFormats("5_16") => 2024-04-05 16:00
+ *     This example represents a date with a day component. 
+ *     The parsed date will have the specified day (5) and time (16:00). 
+ *     Since the parsed day (5) is before the current day (27), the parsed date is adjusted to the next month (April).
+ *
+ * @param dateStr - The date string to parse.
+ * @returns A `dayjs` object representing the parsed date, or `undefined` if the date string cannot be parsed.
+ *
+ */
 function parseDateWithFormats(dateStr: string): dayjs.Dayjs | undefined {
   const now = dayjs();
   for (const format of formats) {
@@ -155,7 +212,27 @@ function parseDateWithFormats(dateStr: string): dayjs.Dayjs | undefined {
   return undefined;
 }
 
-export async function meetingNote() {
+/**
+ * Creates a meeting note based on the provided template and user input.
+ * 
+ * The function performs the following steps:
+ * 1. Retrieves the configuration for the meeting note from the user settings.
+ * 2. Checks if both the meetingNoteTemplatePath and meetingNoteBasePath are specified in the configuration. If not, it logs an error message and returns.
+ * 3. Reads the content of the meeting note template file.
+ * 4. Prompts the user to enter the date and title for the meeting note.
+ * 5. Parses the user input to extract the date and title.
+ * 6. Preprocesses the date string by adding leading zeros and separating the day and time components.
+ * 7. Parses the preprocessed date string using multiple formats and returns a `dayjs` object representing the parsed date.
+ * 8. If the parsed date is undefined, logs an error message and returns.
+ * 9. Formats the parsed date into a timestamp string with the format "YYYY-MM-DD_HH-mm".
+ * 10. Sanitizes the title by removing special characters and extra spaces.
+ * 11. Replaces placeholders in the template content with the sanitized title and timestamp.
+ * 12. Constructs the note title and path based on the timestamp and sanitized title.
+ * 13. Creates the meeting note file with the note content at the specified path.
+ * 
+ * @returns {Promise<void>} A promise that resolves when the meeting note is created successfully.
+ */
+export async function meetingNote(): Promise<void> {
   const config = await getPlugConfig();
   if (!config.meetingNoteTemplatePath || !config.meetingNoteBasePath) {
     console.log(
@@ -170,8 +247,7 @@ export async function meetingNote() {
   );
   console.log("config.meetingNoteBasePath:", config.meetingNoteBasePath);
 
-  // Correctly await the content of the template
-  let templateContent;
+  let templateContent: string;
   try {
     templateContent = await readNoteContent(config.meetingNoteTemplatePath);
   } catch (error) {
@@ -184,17 +260,13 @@ export async function meetingNote() {
   );
 
   if (userInput !== undefined) {
-    // Strip leading and trailing whitespace from the userInput
     const trimmedUserInput = userInput.trim();
 
-    // Find the index of the first space after the date to separate date from title
-    // Assuming the date does not contain spaces and is followed by a space
     const firstSpaceIndex = trimmedUserInput.indexOf(" ");
 
-    // If there's no space, it might be only a date or title was entered without a date
     if (firstSpaceIndex === -1) {
       console.log("Please enter both a date and a title.");
-      return; // Exit the function if the format is incorrect
+      return;
     }
 
     let dateStr = trimmedUserInput.substring(0, firstSpaceIndex).trim();
