@@ -10,7 +10,6 @@ dayjs.extend(isToday);
 
 export const PLUG_NAME = "meetingNote";
 
-
 /**
  * Represents the configuration schema for a meeting note.
  */
@@ -26,7 +25,7 @@ let configErrorShown = false;
 /**
  * Displays a notification with an error message related to the configuration.
  * If the error is an instance of ZodError, it extracts and displays the specific field errors.
- * 
+ *
  * @param error - The error object to display in the notification.
  * @returns A Promise that resolves when the notification is displayed.
  */
@@ -67,14 +66,14 @@ export async function getPlugConfig(): Promise<MeetingNoteConfig> {
 
 /**
  * Sanitizes the given title by removing special characters and extra spaces.
- * 
+ *
  * @param title - The title to be sanitized.
  * @returns The sanitized title.
  */
 function sanitizeTitle(title: string): string {
   let sanitized = title.replace(/[^\w\s-]/g, " ");
-  sanitized = sanitized.replace(/[\s-]+/g, m => m.includes('-') ? '-' : ' ');
-  sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, '');
+  sanitized = sanitized.replace(/[\s-]+/g, (m) => m.includes("-") ? "-" : " ");
+  sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, "");
 
   return sanitized;
 }
@@ -158,29 +157,28 @@ function preprocessDateStr(dateStr: string): string {
  * If the format includes a day component, the parsed date is checked against the current date and adjusted if necessary.
  * If the parsed time is less than 30 minutes before the current time, the parsed date is adjusted to the next day.
  * If the parsed day is before the current day, the parsed date is adjusted to the next month.
- * 
+ *
  * Examples with today as 2024-03-27 10:00:
  * - parseDateWithFormats("10:20") => 2024-03-27 10:20
- *     This example represents a time without a day component. 
+ *     This example represents a time without a day component.
  *     The parsed date will have the same day as the current date (2024-03-27) and the specified time (10:20).
  * - parseDateWithFormats("9") => 2024-03-28 09:00
- *   This example represents a time without a day component. 
- *     The parsed date will have the next day (2024-03-28) and the specified time (09:00) 
+ *   This example represents a time without a day component.
+ *     The parsed date will have the next day (2024-03-28) and the specified time (09:00)
  *     since it is less than 30 minutes before the current time (10:00).
  * - parseDateWithFormats("10") => 2024-03-27 10:00
- *     This example represents a time without a day component. 
+ *     This example represents a time without a day component.
  *     The parsed date will have the same day as the current date (2024-03-27) and the specified time (10:00).
  * - parseDateWithFormats("30_10") => 2024-03-30 10:00
- *   This example represents a date with a day component. 
+ *   This example represents a date with a day component.
  *     The parsed date will have the specified day (30) and time (10:00).
  * - parseDateWithFormats("5_16") => 2024-04-05 16:00
- *     This example represents a date with a day component. 
- *     The parsed date will have the specified day (5) and time (16:00). 
+ *     This example represents a date with a day component.
+ *     The parsed date will have the specified day (5) and time (16:00).
  *     Since the parsed day (5) is before the current day (27), the parsed date is adjusted to the next month (April).
  *
  * @param dateStr - The date string to parse.
  * @returns A `dayjs` object representing the parsed date, or `undefined` if the date string cannot be parsed.
- *
  */
 function parseDateWithFormats(dateStr: string): dayjs.Dayjs | undefined {
   const now = dayjs();
@@ -212,9 +210,25 @@ function parseDateWithFormats(dateStr: string): dayjs.Dayjs | undefined {
   return undefined;
 }
 
+
+/**
+ * Checks if a note with the given page name exists.
+ * @param pageName - The name of the page to check.
+ * @returns A promise that resolves to a boolean indicating whether the note exists.
+ */
+async function noteExists(pageName: string): Promise<boolean> {
+  try {
+    const pageMeta = await space.getPageMeta(pageName);
+    return !!pageMeta; // If pageMeta is truthy, return true
+  } catch {
+    return false; // Assume false if there's an error fetching page metadata
+  }
+}
+
+
 /**
  * Creates a meeting note based on the provided template and user input.
- * 
+ *
  * The function performs the following steps:
  * 1. Retrieves the configuration for the meeting note from the user settings.
  * 2. Checks if both the meetingNoteTemplatePath and meetingNoteBasePath are specified in the configuration. If not, it logs an error message and returns.
@@ -229,7 +243,7 @@ function parseDateWithFormats(dateStr: string): dayjs.Dayjs | undefined {
  * 11. Replaces placeholders in the template content with the sanitized title and timestamp.
  * 12. Constructs the note title and path based on the timestamp and sanitized title.
  * 13. Creates the meeting note file with the note content at the specified path.
- * 
+ *
  * @returns {Promise<void>} A promise that resolves when the meeting note is created successfully.
  */
 export async function meetingNote(): Promise<void> {
@@ -238,20 +252,20 @@ export async function meetingNote(): Promise<void> {
     console.log(
       "Please enter both a meetingNoteTemplatePath and meetingNoteBasePath.",
     );
+    await editor.flashNotification(
+      "Please enter both a meetingNoteTemplatePath and meetingNoteBasePath.",
+      "error",
+    );
     return;
   }
-
-  console.log(
-    "config.meetingNoteTemplatePath:",
-    config.meetingNoteTemplatePath,
-  );
-  console.log("config.meetingNoteBasePath:", config.meetingNoteBasePath);
 
   let templateContent: string;
   try {
     templateContent = await readNoteContent(config.meetingNoteTemplatePath);
-  } catch (error) {
+  }
+  catch (error) {
     console.error("Failed to read template content:", error);
+    await editor.flashNotification("Failed to read template content", "error");
     return;
   }
 
@@ -266,6 +280,7 @@ export async function meetingNote(): Promise<void> {
 
     if (firstSpaceIndex === -1) {
       console.log("Please enter both a date and a title.");
+      await editor.flashNotification("Please enter both a date and a title.", "error");
       return;
     }
 
@@ -281,6 +296,7 @@ export async function meetingNote(): Promise<void> {
     const parsedDate = parseDateWithFormats(dateStr);
     if (!parsedDate) {
       console.error("Could not parse date.");
+      await editor.flashNotification("Could not parse date.", "error");
       return;
     }
 
@@ -300,13 +316,21 @@ export async function meetingNote(): Promise<void> {
 
     const notePath = `${config.meetingNoteBasePath}/${noteTitle}`;
 
+    if (await noteExists(notePath)) {
+      console.log("Note already exists!");
+      await editor.flashNotification("Note already exists!", "error");
+      return;
+    }
+
     console.log("notePath:", notePath);
 
     try {
       await space.writePage(notePath, noteContent);
       console.log("Note created successfully!");
+      await editor.flashNotification("Note created successfully!", "info");
     } catch (error) {
       console.error("Failed to create note:", error);
+      await editor.flashNotification("Failed to create note", "error");
     }
   } else {
     console.log("User cancelled the input dialog.");
