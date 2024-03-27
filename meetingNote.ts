@@ -210,7 +210,6 @@ function parseDateWithFormats(dateStr: string): dayjs.Dayjs | undefined {
   return undefined;
 }
 
-
 /**
  * Checks if a note with the given page name exists.
  * @param pageName - The name of the page to check.
@@ -224,7 +223,6 @@ async function noteExists(pageName: string): Promise<boolean> {
     return false; // Assume false if there's an error fetching page metadata
   }
 }
-
 
 /**
  * Creates a meeting note based on the provided template and user input.
@@ -242,7 +240,8 @@ async function noteExists(pageName: string): Promise<boolean> {
  * 10. Sanitizes the title by removing special characters and extra spaces.
  * 11. Replaces placeholders in the template content with the sanitized title and timestamp.
  * 12. Constructs the note title and path based on the timestamp and sanitized title.
- * 13. Creates the meeting note file with the note content at the specified path.
+ * 13. Checks if a note with the constructed path already exists. If it does, logs an error message and returns.
+ * 14. Creates the meeting note file with the note content at the specified path.
  *
  * @returns {Promise<void>} A promise that resolves when the meeting note is created successfully.
  */
@@ -262,8 +261,7 @@ export async function meetingNote(): Promise<void> {
   let templateContent: string;
   try {
     templateContent = await readNoteContent(config.meetingNoteTemplatePath);
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Failed to read template content:", error);
     await editor.flashNotification("Failed to read template content", "error");
     return;
@@ -280,7 +278,10 @@ export async function meetingNote(): Promise<void> {
 
     if (firstSpaceIndex === -1) {
       console.log("Please enter both a date and a title.");
-      await editor.flashNotification("Please enter both a date and a title.", "error");
+      await editor.flashNotification(
+        "Please enter both a date and a title.",
+        "error",
+      );
       return;
     }
 
