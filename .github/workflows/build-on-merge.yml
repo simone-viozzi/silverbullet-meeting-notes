@@ -1,0 +1,35 @@
+name: Build and Commit on Merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # Ensures the history is fully checked out
+
+    - name: Set up Deno
+      uses: denoland/setup-deno@main
+      with:
+        deno-version: '^1.42.0'
+
+    - name: Install silverbullet with Deno
+      run: |
+        deno install -f --name silverbullet --unstable-kv --unstable-worker-options -A https://get.silverbullet.md
+
+    - name: Build with Deno
+      run: deno task build
+
+    - name: Commit and Push meetingNote.plug.js
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git add meetingNote.plug.js
+        git commit -m "Auto-update meetingNote.plug.js" || echo "No changes to commit"
+        git push
