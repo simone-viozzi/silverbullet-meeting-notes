@@ -93,8 +93,3 @@ If you would like to install this plug straight from Github, make sure you have 
 ```
 
 to your `PLUGS` file, run `Plugs: Update` command and off you go!
-
-
----
-
-need to test rebuild
