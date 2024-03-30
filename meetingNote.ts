@@ -65,15 +65,34 @@ export async function getPlugConfig(): Promise<MeetingNoteConfig> {
 }
 
 /**
- * Sanitizes the given title by removing special characters and extra spaces.
+ * Sanitizes a given title by applying a series of formatting rules to ensure consistency.
+ * This includes replacing special characters with hyphens, collapsing multiple hyphens into a single hyphen,
+ * ensuring hyphens are surrounded by spaces, and collapsing multiple spaces into a single space.
+ * Leading and trailing spaces or hyphens are removed.
  *
- * @param title - The title to be sanitized.
- * @returns The sanitized title.
+ * @param title - The title string to be sanitized.
+ * @returns The sanitized title, with special characters and consecutive hyphens replaced by a single hyphen,
+ *          excess spaces removed, and hyphens properly spaced.
+ *
+ * Example usage:
+ *   sanitizeTitle("--STM++meeting1==")   // Returns: "STM - meeting1"
+ *   sanitizeTitle("STM meeting1")        // Returns: "STM meeting1"
+ *   sanitizeTitle("STM|meeting1")        // Returns: "STM - meeting1"
+ *   sanitizeTitle("STM    meeting1")     // Returns: "STM meeting1"
+ *   sanitizeTitle("STM-meeting1")        // Returns: "STM - meeting1"
+ *   sanitizeTitle("STM:meeting1")        // Returns: "STM - meeting1"
+ *   sanitizeTitle("  STM meeting1  ")    // Returns: "STM meeting1"
+ *   sanitizeTitle("STM@meeting1")        // Returns: "STM - meeting1"
+ *   sanitizeTitle("STM#meeting1")        // Returns: "STM - meeting1"
+ *   sanitizeTitle("STM&meeting1")        // Returns: "STM - meeting1"
  */
 function sanitizeTitle(title: string): string {
-  let sanitized = title.replace(/[^\w\s-]/g, " ");
-  sanitized = sanitized.replace(/[\s-]+/g, (m) => m.includes("-") ? "-" : " ");
-  sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, "");
+  let sanitized = title.replace(/[^a-zA-Z0-9\s]/g, '-');
+  sanitized = sanitized.replace(/-+/g, '-'); // Collapse multiple hyphens into a single hyphen
+  sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, '');
+  // Ensure hyphens are surrounded by spaces unless they are already appropriately spaced
+  sanitized = sanitized.replace(/(?<! )-(?! )/g, ' - ');
+  sanitized = sanitized.replace(/\s+/g, ' ');
 
   return sanitized;
 }
