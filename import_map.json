@@ -1,7 +1,10 @@
 {
   "imports": {
     "$sb/": "https://deno.land/x/silverbullet/plug-api/",
+    "$common/": "https://deno.land/x/silverbullet/common/",
+    "$lib/": "https://deno.land/x/silverbullet/lib/",
     "$date-fns/": "https://deno.land/x/date_fns/",
-    "zod": "https://deno.land/x/zod@v3.22.4/mod.ts"
+    "zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
+    "@replit/codemirror-vim": "https://esm.sh/@replit/codemirror-vim@6.0.14?external=@codemirror/state,@codemirror/language,@codemirror/view,@codemirror/search,@codemirror/commands"
   }
 }
