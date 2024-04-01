@@ -2,6 +2,7 @@
   "version": "3",
   "redirects": {
     "https://deno.land/std/assert/assert_equals.ts": "https://deno.land/std@0.221.0/assert/assert_equals.ts",
+    "https://deno.land/std/testing/asserts.ts": "https://deno.land/std@0.221.0/testing/asserts.ts",
     "https://deno.land/x/silverbullet/common/command.ts": "https://deno.land/x/silverbullet@0.7.6/common/command.ts",
     "https://deno.land/x/silverbullet/common/common_system.ts": "https://deno.land/x/silverbullet@0.7.6/common/common_system.ts",
     "https://deno.land/x/silverbullet/common/deps.ts": "https://deno.land/x/silverbullet@0.7.6/common/deps.ts",
