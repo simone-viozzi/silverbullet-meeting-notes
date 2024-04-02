@@ -2,7 +2,8 @@
   "importMap": "import_map.json",
   "tasks": {
     "build": "silverbullet plug:compile --importmap import_map.json meetingNote.plug.yaml",
-    "watch": "silverbullet plug:compile --importmap import_map.json meetingNote.plug.yaml -w"
+    "watch": "silverbullet plug:compile --importmap import_map.json meetingNote.plug.yaml -w",
+    "test": "deno test -A --unstable-kv  --unstable-worker-options"
   },
   "lint": {
     "rules": {
