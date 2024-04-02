@@ -158,11 +158,8 @@ export async function meetingNote(): Promise<void> {
       return;
     }
 
-    let dateStr = trimmedUserInput.substring(0, firstSpaceIndex).trim();
+    const dateStr = trimmedUserInput.substring(0, firstSpaceIndex).trim();
     const title = trimmedUserInput.substring(firstSpaceIndex + 1).trim();
-
-    // Preprocess the date string to add leading zeros where necessary
-    dateStr = preprocessDateStr(dateStr);
 
     console.log("dateStr:", dateStr);
     console.log("title:", title);

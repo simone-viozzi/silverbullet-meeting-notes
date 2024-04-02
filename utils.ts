@@ -46,15 +46,6 @@ export function formatTimestamp(date: dayjs.Dayjs): string {
   return date.format("YYYY-MM-DD_HH-mm");
 }
 
-const formats = [
-  "DD_HH-mm",
-  "DD_HH:mm",
-  "DD_HH",
-  "HH:mm",
-  "HH-mm",
-  "HH",
-];
-
 /**
  * Preprocesses a date string by separating the day and time components and formatting them.
  * If the date string includes a day component, it is separated from the time component and padded if necessary.
@@ -65,35 +56,42 @@ const formats = [
  * @returns The preprocessed and formatted date string.
  */
 export function preprocessDateStr(dateStr: string): string {
-  // First, identify if the format includes a day component by checking for an underscore
   const hasDayComponent = dateStr.includes("_");
   let dayPart = "";
   let timePart = dateStr;
 
-  // If there's a day component, separate the day from the time
   if (hasDayComponent) {
     const parts = dateStr.split("_");
     dayPart = parts[0].padStart(2, "0") + "_"; // Pad the day part
-    timePart = parts[1];
+    timePart = parts.length > 1 ? parts[1] : "";
   }
 
-  // Process the time part for hours and minutes
-  // Split the string by delimiters known to be used in the time formats
+  if (!timePart) { // Check if time part is missing
+    return ""; // Return empty or some marker for invalid
+  }
+
   const timeParts = timePart.split(/[-:]/);
   const delimiter = timePart.includes(":")
     ? ":"
     : timePart.includes("-")
     ? "-"
-    : ":"; // Maintain the original delimiter
+    : ":";
 
-  // Reconstruct the time part with padded values
   const processedTimePart = timeParts.map((part) => part.padStart(2, "0")).join(
     delimiter,
   );
 
-  // Rejoin the day and time parts if necessary
   return dayPart + processedTimePart;
 }
+
+const formats = [
+  "DD_HH-mm",
+  "DD_HH:mm",
+  "DD_HH",
+  "HH:mm",
+  "HH-mm",
+  "HH",
+];
 
 /**
  * Parses a date string using multiple formats and returns a `dayjs` object representing the parsed date.
@@ -131,56 +129,40 @@ export function parseDateWithFormats(
   dateStr: string,
   now: dayjs.Dayjs = dayjs(),
 ): dayjs.Dayjs | undefined {
-  //const now = dayjs();
-  for (const format of formats) {
-    let d = dayjs(dateStr, format, true); // Using strict parsing
-
-    if (!d.isValid()) {
-      continue;
-    }
-
-    let i = 1;
-
-    console.log("now: ", now.format("YYYY-MM-DD HH:mm"));
-    console.log("date: ", dateStr);
-    console.log("format used: ", format);
-
-    console.log(`step ${i}: `, d.format("YYYY-MM-DD HH:mm"));
-    i += 1;
-
-    if (!format.includes("DD")) {
-      d = d.month(now.month()).year(now.year()); // Adjust this line to set month and year
-    }
-
-    console.log(`step ${i}: `, d.format("YYYY-MM-DD HH:mm"));
-    i += 1;
-
-    // Ensure the date is set to today if the format doesn't specify the day
-    if (format.startsWith("HH")) {
-      d = d.date(now.date()).month(now.month()).year(now.year());
-    }
-
-    console.log(`step ${i}: `, d.format("YYYY-MM-DD HH:mm"));
-    i += 1;
-
-    // If the parsed time is less than now - 30 minutes, add a day
-    if (d.isBefore(now.subtract(30, "minute"))) {
-      d = d.add(1, "day");
-    }
-
-    console.log(`step ${i}: `, d.format("YYYY-MM-DD HH:mm"));
-    i += 1;
-
-    // If the parsed day is before today, add a month
-    // This logic assumes the date is for a monthly recurring event
-    if (!d.isToday() && d.isBefore(now, "day")) {
-      d = d.add(1, "month");
-    }
-
-    console.log(`step ${i}: `, d.format("YYYY-MM-DD HH:mm"));
-    i += 1;
-
-    return d;
+  dateStr = preprocessDateStr(dateStr); // Assuming this prepares dateStr correctly for parsing
+  console.log("Parsing date:", dateStr);
+  if (dateStr === "") { // Check for the invalid/missing component indicator
+    console.log("Invalid or incomplete date string.");
+    return undefined;
   }
-  return undefined;
+
+  let parsedDate = undefined;
+
+  for (const format of formats) {
+    let d = dayjs(dateStr, format, true);
+    if (!d.isValid()) continue;
+
+    if (format.includes("DD")) {
+      d = d.year(now.year()).month(now.month()).date(d.date());
+      if (d.isBefore(now)) {
+        if (d.month() !== now.month()) {
+          d = d.subtract(1, "month");
+        } else {
+          d = d.add(1, "month");
+        }
+      }
+    } else {
+      d = now.hour(d.hour()).minute(d.minute()).second(0);
+
+      // Special handling for exactly 30 minutes before now
+      if (d.isBefore(now.subtract(30, "minute"))) {
+        d = d.add(1, "day");
+      }
+    }
+
+    parsedDate = d;
+    break;
+  }
+
+  return parsedDate;
 }
