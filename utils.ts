@@ -29,11 +29,13 @@ dayjs.extend(isToday);
  */
 export function sanitizeTitle(title: string): string {
   let sanitized = title.replace(/[^a-zA-Z0-9\s]/g, "-");
-  sanitized = sanitized.replace(/-+/g, "-");
   sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, "");
+  sanitized = sanitized.replace(/\s+/g, " ");
+  sanitized = sanitized.replace(/-+/g, "-");
+  sanitized = sanitized.replace(/(\s*-\s*)+/g, "-");
   sanitized = sanitized.replace(/-/g, " - ");
   sanitized = sanitized.replace(/\s+/g, " ");
-
+  
   return sanitized;
 }
 

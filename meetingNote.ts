@@ -174,6 +174,12 @@ export async function meetingNote(): Promise<void> {
     const timestamp = formatTimestamp(parsedDate);
     const sanitizedTitle = sanitizeTitle(title);
 
+    if (!sanitizedTitle) {
+      console.log("Invalid title.");
+      await editor.flashNotification("Invalid title.", "error");
+      return;
+    }
+
     console.log("timestamp:", timestamp);
     console.log("sanitizedTitle:", sanitizedTitle);
 

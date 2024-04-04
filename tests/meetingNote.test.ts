@@ -21,6 +21,10 @@ Deno.test("sanitizeTitle with a single special character", () => {
   assertEquals(sanitizeTitle("[tag]|meeting1"), "tag - meeting1");
 });
 
+Deno.test("sanitizeTitle with a special character and dash", () => {
+  assertEquals(sanitizeTitle("[tag] - meeting1"), "tag - meeting1");
+});
+
 Deno.test("sanitizeTitle with multiple spaces", () => {
   assertEquals(sanitizeTitle("[tag]    meeting1"), "tag - meeting1");
 });
@@ -48,6 +52,52 @@ Deno.test("sanitizeTitle with # symbol", () => {
 Deno.test("sanitizeTitle with & symbol", () => {
   assertEquals(sanitizeTitle("[tag]&meeting1"), "tag - meeting1");
 });
+
+Deno.test("sanitizeTitle with multiple consecutive special characters", () => {
+  assertEquals(sanitizeTitle("tag==@#meeting1"), "tag - meeting1");
+});
+
+Deno.test("sanitizeTitle with mixed spaces and hyphens", () => {
+  assertEquals(sanitizeTitle("tag - -  meeting1"), "tag - meeting1");
+});
+
+Deno.test("sanitizeTitle with underscores", () => {
+  assertEquals(sanitizeTitle("tag_meeting1"), "tag - meeting1");
+});
+
+Deno.test("sanitizeTitle with multiple types of special characters", () => {
+  assertEquals(sanitizeTitle("tag&*#(@meeting1"), "tag - meeting1");
+});
+
+Deno.test("sanitizeTitle with numbers and special characters", () => {
+  assertEquals(sanitizeTitle("tag123@meeting1"), "tag123 - meeting1");
+});
+
+Deno.test("sanitizeTitle with only special characters", () => {
+  assertEquals(sanitizeTitle("###@@@"), "");
+});
+
+Deno.test("sanitizeTitle with leading special characters before spaces", () => {
+  assertEquals(sanitizeTitle("!!! tag meeting1"), "tag meeting1");
+});
+
+Deno.test("sanitizeTitle with trailing special characters after spaces", () => {
+  assertEquals(sanitizeTitle("tag meeting1 !!!"), "tag meeting1");
+});
+
+Deno.test("sanitizeTitle with special characters between words", () => {
+  assertEquals(sanitizeTitle("tag+++meeting+++1"), "tag - meeting - 1");
+});
+
+Deno.test("sanitizeTitle with special characters between words v2", () => {
+  assertEquals(sanitizeTitle("1-3-$##@meeting+++1"), "1 - 3 - meeting - 1");
+});
+
+
+Deno.test("sanitizeTitle with alphanumeric and special characters mix", () => {
+  assertEquals(sanitizeTitle("1a2b3c@@@meeting"), "1a2b3c - meeting");
+});
+
 
 
 
