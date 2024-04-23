@@ -28,14 +28,23 @@ dayjs.extend(isToday);
  *   sanitizeTitle("tag&meeting1")        // Returns: "tag - meeting1"
  */
 export function sanitizeTitle(title: string): string {
+  // console.log("Sanitizing title:", title);
   let sanitized = title.replace(/[^a-zA-Z0-9\s]/g, "-");
+  // console.log("Step 1:", sanitized);
   sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, "");
+  // console.log("Step 2:", sanitized);
   sanitized = sanitized.replace(/\s+/g, " ");
-  sanitized = sanitized.replace(/-+/g, "-");
-  sanitized = sanitized.replace(/(\s*-\s*)+/g, "-");
-  sanitized = sanitized.replace(/-/g, " - ");
+  // console.log("Step 3:", sanitized);
+  sanitized = sanitized.replace(/-{2,}/g, " - ");
+  // console.log("Step 4:", sanitized);
+  sanitized = sanitized.replace(/([a-zA-Z0-9])-[^a-zA-Z0-9]/g, "$1 - ");
+  // console.log("Step 5:", sanitized);
+  sanitized = sanitized.replace(/[^a-zA-Z0-9]-([a-zA-Z0-9])/g, " - $1");
+  // console.log("Step 6:", sanitized);
+  sanitized = sanitized.replace(/( - )+(- )+/g, " - ");
+  // console.log("Step 7:", sanitized);
   sanitized = sanitized.replace(/\s+/g, " ");
-  
+  // console.log("Step 8:", sanitized);
   return sanitized;
 }
 
@@ -142,7 +151,9 @@ export function parseDateWithFormats(
 
   for (const format of formats) {
     let d = dayjs(dateStr, format, true);
-    if (!d.isValid()) continue;
+    if (!d.isValid()) {
+      continue;
+    }
 
     if (format.includes("DD")) {
       d = d.year(now.year()).month(now.month()).date(d.date());

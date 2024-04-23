@@ -18,7 +18,7 @@ Deno.test("sanitizeTitle with spaces", () => {
 });
 
 Deno.test("sanitizeTitle with a single special character", () => {
-  assertEquals(sanitizeTitle("[tag]|meeting1"), "tag - meeting1");
+  assertEquals(sanitizeTitle("[tag]%meeting1"), "tag - meeting1");
 });
 
 Deno.test("sanitizeTitle with a special character and dash", () => {
@@ -30,7 +30,7 @@ Deno.test("sanitizeTitle with multiple spaces", () => {
 });
 
 Deno.test("sanitizeTitle with hyphens without spaces", () => {
-  assertEquals(sanitizeTitle("tag-meeting1"), "tag - meeting1");
+  assertEquals(sanitizeTitle("tag-meeting1"), "tag-meeting1");
 });
 
 Deno.test("sanitizeTitle with colon", () => {
@@ -62,7 +62,7 @@ Deno.test("sanitizeTitle with mixed spaces and hyphens", () => {
 });
 
 Deno.test("sanitizeTitle with underscores", () => {
-  assertEquals(sanitizeTitle("tag_meeting1"), "tag - meeting1");
+  assertEquals(sanitizeTitle("tag_meeting1"), "tag-meeting1");
 });
 
 Deno.test("sanitizeTitle with multiple types of special characters", () => {
@@ -70,7 +70,7 @@ Deno.test("sanitizeTitle with multiple types of special characters", () => {
 });
 
 Deno.test("sanitizeTitle with numbers and special characters", () => {
-  assertEquals(sanitizeTitle("tag123@meeting1"), "tag123 - meeting1");
+  assertEquals(sanitizeTitle("tag123@meeting1"), "tag123-meeting1");
 });
 
 Deno.test("sanitizeTitle with only special characters", () => {
@@ -90,13 +90,22 @@ Deno.test("sanitizeTitle with special characters between words", () => {
 });
 
 Deno.test("sanitizeTitle with special characters between words v2", () => {
-  assertEquals(sanitizeTitle("1-3-$##@meeting+++1"), "1 - 3 - meeting - 1");
+  assertEquals(sanitizeTitle("1-3-$##@meeting+++1"), "1-3 - meeting - 1");
 });
 
 
 Deno.test("sanitizeTitle with alphanumeric and special characters mix", () => {
   assertEquals(sanitizeTitle("1a2b3c@@@meeting"), "1a2b3c - meeting");
 });
+
+Deno.test("sanitizeTitle with special characters at the start of words", () => {
+  assertEquals(sanitizeTitle("[t-ag] meeting title"), "t-ag - meeting title");
+});
+
+Deno.test("sanitizeTitle with special characters inside words", () => {
+  assertEquals(sanitizeTitle("[tag] meeting-title"), "tag - meeting-title");
+});
+
 
 
 
