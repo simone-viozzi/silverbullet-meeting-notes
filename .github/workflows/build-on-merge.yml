@@ -31,7 +31,9 @@ jobs:
         deno install -f --name silverbullet --unstable-kv --unstable-worker-options -A https://get.silverbullet.md
 
     - name: Build with Deno
-      run: deno task build
+      run: |
+        set -e
+        deno task build
 
     - name: Commit and Push meetingNote.plug.js
       run: |
