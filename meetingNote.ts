@@ -1,4 +1,6 @@
-import { editor, space, system } from "@silverbulletmd/silverbullet/syscalls";
+import { editor } from "https://deno.land/x/silverbullet@0.10.4/plug-api/lib/editor.ts";
+import { space } from "https://deno.land/x/silverbullet@0.10.4/plug-api/lib/space.ts";
+import { system } from "https://deno.land/x/silverbullet@0.10.4/plug-api/lib/system.ts";
 import dayjs from "https://esm.sh/dayjs";
 import customParseFormat from "https://esm.sh/dayjs/plugin/customParseFormat.js";
 import isToday from "https://esm.sh/dayjs/plugin/isToday.js";

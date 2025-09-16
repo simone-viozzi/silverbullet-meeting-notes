@@ -1,10 +1,13 @@
 import { assertEquals } from "https://deno.land/std/assert/assert_equals.ts";
-import { sanitizeTitle, parseDateWithFormats, formatTimestamp } from "../utils.ts";
+import {
+  formatTimestamp,
+  parseDateWithFormats,
+  sanitizeTitle,
+} from "../utils.ts";
 
 import dayjs from "https://esm.sh/dayjs";
 import customParseFormat from "https://esm.sh/dayjs/plugin/customParseFormat.js";
 import isToday from "https://esm.sh/dayjs/plugin/isToday.js";
-
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isToday);
@@ -93,7 +96,6 @@ Deno.test("sanitizeTitle with special characters between words v2", () => {
   assertEquals(sanitizeTitle("1-3-$##@meeting+++1"), "1-3 - meeting - 1");
 });
 
-
 Deno.test("sanitizeTitle with alphanumeric and special characters mix", () => {
   assertEquals(sanitizeTitle("1a2b3c@@@meeting"), "1a2b3c - meeting");
 });
@@ -106,60 +108,56 @@ Deno.test("sanitizeTitle with special characters inside words", () => {
   assertEquals(sanitizeTitle("[tag] meeting-title"), "tag - meeting-title");
 });
 
-
-
-
-
 Deno.test("parseDateWithFormats without day component, time after now", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("10:20", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_10-20");
 });
 
 Deno.test("parseDateWithFormats without day component, time before now", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("09:00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-28_09-00");
 });
 
 Deno.test("parseDateWithFormats with day component, time after current time", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("30_10-00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-30_10-00");
 });
 
 Deno.test("parseDateWithFormats with day component, day before today", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("5_16-00", now)!;
   assertEquals(formatTimestamp(result), "2024-04-05_16-00");
 });
 
 Deno.test("parseDateWithFormats without day component, exact current time", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("10:00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_10-00");
 });
 
 Deno.test("parseDateWithFormats with future day component, time before now", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("28_09-00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-28_09-00");
 });
 
 Deno.test("parseDateWithFormats with current day component, time far in future", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("27_20-00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_20-00");
 });
 
 Deno.test("parseDateWithFormats with past day component, rolls to next month", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("1_12-00", now)!;
   assertEquals(formatTimestamp(result), "2024-04-01_12-00");
 });
 
 Deno.test("parseDateWithFormats with invalid date string (missing time)", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   let passed = false;
   try {
     const result = parseDateWithFormats("27_", now);
@@ -171,60 +169,56 @@ Deno.test("parseDateWithFormats with invalid date string (missing time)", () => 
 });
 
 Deno.test("parseDateWithFormats with time exactly 30 minutes before now", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("09:30", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_09-30");
 });
 
 Deno.test("schedule a meeting for the first of the next month", () => {
   // Assuming the current date is the last day of March
-  const now = dayjs('2024-03-31T10:00:00');
+  const now = dayjs("2024-03-31T10:00:00");
   const result = parseDateWithFormats("1_15-00", now)!;
   assertEquals(formatTimestamp(result), "2024-04-01_15-00");
 });
-
 
 Deno.test("schedule a meeting for the first of the next month", () => {
   // Assuming the current date is the last day of March
-  const now = dayjs('2024-03-31T17:00:00');
+  const now = dayjs("2024-03-31T17:00:00");
   const result = parseDateWithFormats("15-00", now)!;
   assertEquals(formatTimestamp(result), "2024-04-01_15-00");
 });
 
 Deno.test("schedule a meeting at the end of February (common year)", () => {
   // Assuming the current date is the last day of February in a common year
-  const now = dayjs('2023-02-28T10:00:00');
+  const now = dayjs("2023-02-28T10:00:00");
   const result = parseDateWithFormats("1_15-00", now)!;
   assertEquals(formatTimestamp(result), "2023-03-01_15-00");
 });
 
-
 Deno.test("schedule a meeting at the end of February (common year)", () => {
   // Assuming the current date is the last day of February in a common year
-  const now = dayjs('2023-02-28T17:00:00');
+  const now = dayjs("2023-02-28T17:00:00");
   const result = parseDateWithFormats("15-00", now)!;
   assertEquals(formatTimestamp(result), "2023-03-01_15-00");
 });
 
-
 Deno.test("schedule a meeting at the end of February (leap year)", () => {
   // Assuming the current date is the last day of February in a leap year
-  const now = dayjs('2024-02-29T10:00:00');
+  const now = dayjs("2024-02-29T10:00:00");
   const result = parseDateWithFormats("1_15-00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-01_15-00");
 });
 
 Deno.test("schedule a meeting for December 15 when it's currently December 15", () => {
-  const now = dayjs('2024-12-15T10:00:00');
+  const now = dayjs("2024-12-15T10:00:00");
   const result = parseDateWithFormats("10_15-00", now)!;
   // Since the day is before the current day (considering months roll over),
   // it should schedule for January of the next year, adjusting for the described logic.
   assertEquals(formatTimestamp(result), "2025-01-10_15-00");
 });
 
-
 Deno.test("parseDateWithFormats with non-numeric values", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   let passed = false;
   try {
     const result = parseDateWithFormats("XX_YY-ZZ", now);
@@ -236,7 +230,7 @@ Deno.test("parseDateWithFormats with non-numeric values", () => {
 });
 
 Deno.test("parseDateWithFormats with completely incorrect formats", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   let passed = false;
   try {
     const result = parseDateWithFormats("incorrect format", now);
@@ -248,77 +242,74 @@ Deno.test("parseDateWithFormats with completely incorrect formats", () => {
 });
 
 Deno.test("parseDateWithFormats with empty string", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("", now);
   assertEquals(result, undefined);
 });
 
-
 Deno.test("parseDateWithFormats with partial inputs - missing minutes", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("10", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_10-00");
 });
 
 Deno.test("parseDateWithFormats at midnight", () => {
-  const now = dayjs('2024-03-27T00:00:00');
+  const now = dayjs("2024-03-27T00:00:00");
   const result = parseDateWithFormats("27_00:00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_00-00");
 });
 
 Deno.test("parseDateWithFormats at midday", () => {
-  const now = dayjs('2024-03-27T12:00:00');
+  const now = dayjs("2024-03-27T12:00:00");
   const result = parseDateWithFormats("27_12:00", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_12-00");
 });
 
 Deno.test("parseDateWithFormats at one minute to midnight", () => {
-  const now = dayjs('2024-03-27T23:59:00');
+  const now = dayjs("2024-03-27T23:59:00");
   const result = parseDateWithFormats("27_23:59", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_23-59");
 });
 
-
 Deno.test("parseDateWithFormats with different separators - colon", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("27_10:30", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_10-30");
 });
 
-
 Deno.test("parseDateWithFormats with format DD_HH-mm", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("28_11-30", now)!;
   assertEquals(formatTimestamp(result), "2024-03-28_11-30");
 });
 
 Deno.test("parseDateWithFormats with format DD_HH:mm", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("28_11:30", now)!;
   assertEquals(formatTimestamp(result), "2024-03-28_11-30");
 });
 
 Deno.test("parseDateWithFormats with format DD_HH", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("28_11", now)!;
   // Assumes default minute of "00" if minutes are not specified
   assertEquals(formatTimestamp(result), "2024-03-28_11-00");
 });
 
 Deno.test("parseDateWithFormats with format HH:mm", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("11:30", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_11-30");
 });
 
 Deno.test("parseDateWithFormats with format HH-mm", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("11-30", now)!;
   assertEquals(formatTimestamp(result), "2024-03-27_11-30");
 });
 
 Deno.test("parseDateWithFormats with format HH", () => {
-  const now = dayjs('2024-03-27T10:00:00');
+  const now = dayjs("2024-03-27T10:00:00");
   const result = parseDateWithFormats("12", now)!;
   // Assumes default minute of "00" if minutes are not specified
   assertEquals(formatTimestamp(result), "2024-03-27_12-00");
