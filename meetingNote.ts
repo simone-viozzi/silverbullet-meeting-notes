@@ -1,4 +1,4 @@
-import { editor, space, system } from "$sb/syscalls.ts";
+import { editor, space, system } from "@silverbulletmd/silverbullet/syscalls";
 import dayjs from "https://esm.sh/dayjs";
 import customParseFormat from "https://esm.sh/dayjs/plugin/customParseFormat.js";
 import isToday from "https://esm.sh/dayjs/plugin/isToday.js";
