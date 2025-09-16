@@ -1,8 +1,7 @@
-import { editor, space } from "$sb/syscalls.ts";
+import { editor, space, system } from "$sb/syscalls.ts";
 import dayjs from "https://esm.sh/dayjs";
 import customParseFormat from "https://esm.sh/dayjs/plugin/customParseFormat.js";
 import isToday from "https://esm.sh/dayjs/plugin/isToday.js";
-import { readSetting } from "$sb/lib/settings_page.ts";
 import { z, ZodError } from "zod";
 
 import {
@@ -60,7 +59,7 @@ async function showConfigErrorNotification(error: unknown) {
 }
 
 export async function getPlugConfig(): Promise<MeetingNoteConfig> {
-  const userConfig = await readSetting(PLUG_NAME);
+  const userConfig = await system.getSpaceConfig(PLUG_NAME, {});
 
   try {
     return meetingNoteConfigSchema.parse(userConfig || {});
