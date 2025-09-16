@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "4",
   "redirects": {
     "https://deno.land/std/assert/assert_equals.ts": "https://deno.land/std@0.221.0/assert/assert_equals.ts",
     "https://deno.land/std/testing/asserts.ts": "https://deno.land/std@0.221.0/testing/asserts.ts",
@@ -114,5 +114,10 @@
     "https://esm.sh/v135/dayjs@1.11.10/denonext/dayjs.mjs": "6de3caef41ea8e21568a8de0dfaacf0861ea7032d5240689677dec6b0253f860",
     "https://esm.sh/v135/dayjs@1.11.10/denonext/plugin/customParseFormat.js": "64e58bc2bd362c95dc4511cd1abcb1621cd8b18b5e541de92307b8c7426216bc",
     "https://esm.sh/v135/dayjs@1.11.10/denonext/plugin/isToday.js": "0825986c0953c75b596ff3104cf8eb2a09c1516227ac1c2faa9f6bd40cab9687"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@silverbulletmd/silverbullet@~0.10.4"
+    ]
   }
 }
