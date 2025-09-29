@@ -1,0 +1,32 @@
+{
+  "imports": {
+    "@silverbulletmd/silverbullet": "jsr:@silverbulletmd/silverbullet@^2.1.5",
+    "@silverbulletmd/silverbullet/syscalls": "jsr:@silverbulletmd/silverbullet@^2.1.5/syscalls",
+    "zod": "https://deno.land/x/zod@v3.25/mod.ts",
+    "dayjs": "https://esm.sh/dayjs@1.11.18",
+    "dayjs/plugin/customParseFormat": "https://esm.sh/dayjs@1.11.18/plugin/customParseFormat.js",
+    "dayjs/plugin/isToday": "https://esm.sh/dayjs@1.11.18/plugin/isToday.js"
+  },
+  "tasks": {
+    "build": "silverbullet plug:compile meetingNote.plug.yaml -c deno.json",
+    "watch": "silverbullet plug:compile meetingNote.plug.yaml -w -c deno.json",
+    "debug": "silverbullet plug:compile meetingNote.plug.yaml --info --debug -c deno.json",
+    "test": "deno test tests/ -A --unstable-kv  --unstable-worker-options"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-explicit-any"]
+    }
+  },
+  "fmt": {
+    "exclude": [
+      "*.md",
+      "**/*.md",
+      "*.plug.js"
+    ]
+  },
+  "test": {
+    "include": ["tests/**/*.ts"],
+    "exclude": ["tmp/**"]
+  }
+}
