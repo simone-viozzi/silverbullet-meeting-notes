@@ -24,7 +24,7 @@ jobs:
       - name: Set up Deno
         uses: denoland/setup-deno@main
         with:
-          deno-version: "^1.42.0"
+          deno-version: "^2.2.12"
 
       - name: Install silverbullet with Deno
         run: |
