@@ -1,8 +1,4 @@
-import {
-  editor,
-  space,
-  system,
-} from "jsr:@silverbulletmd/silverbullet/syscalls";
+import { editor, space, system } from "@silverbulletmd/silverbullet/syscalls";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import isToday from "dayjs/plugin/isToday";
