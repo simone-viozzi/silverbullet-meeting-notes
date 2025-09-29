@@ -1,19 +1,13 @@
 {
-  "imports": {
-    "@silverbulletmd/silverbullet": "jsr:@silverbulletmd/silverbullet@^0.10.4",
-    "$sb/": "jsr:@silverbulletmd/silverbullet/plug-api/",
-    "zod": "https://deno.land/x/zod@v3.23.8/mod.ts"
-  },
+  "importMap": "import_map.json",
   "tasks": {
-    "build": "silverbullet plug:compile --config ./deno.jsonc meetingNote.plug.yaml",
-    "watch": "silverbullet plug:compile --config ./deno.jsonc meetingNote.plug.yaml -w",
-    "test": "deno test -A --unstable-kv --unstable-worker-options --ignore=tmp/",
+    "build": "silverbullet plug:compile meetingNote.plug.yaml --importmap import_map.json",
+    "watch": "silverbullet plug:compile meetingNote.plug.yaml -w --importmap import_map.json",
+    "test": "deno test tests/ -A --unstable-kv  --unstable-worker-options"
   },
   "lint": {
     "rules": {
-      "exclude": [
-        "no-explicit-any"
-      ]
+      "exclude": ["no-explicit-any"]
     }
   },
   "fmt": {
@@ -22,5 +16,9 @@
       "**/*.md",
       "*.plug.js"
     ]
+  },
+  "test": {
+    "include": ["tests/**/*.ts"],
+    "exclude": ["tmp/**"]
   }
 }

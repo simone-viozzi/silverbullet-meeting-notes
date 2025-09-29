@@ -1,6 +1,6 @@
-import dayjs from "https://esm.sh/dayjs";
-import customParseFormat from "https://esm.sh/dayjs/plugin/customParseFormat.js";
-import isToday from "https://esm.sh/dayjs/plugin/isToday.js";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import isToday from "dayjs/plugin/isToday";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isToday);

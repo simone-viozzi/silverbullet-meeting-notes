@@ -11,6 +11,7 @@ pkgs.mkShell {
     git # Version control
     curl # For downloading dependencies
     jq # JSON processing tool
+    uv
   ];
 
   # Environment variables
