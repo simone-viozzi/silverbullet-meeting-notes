@@ -28,7 +28,7 @@ jobs:
 
       - name: Install silverbullet with Deno
         run: |
-          deno install -f --name silverbullet --unstable-kv --unstable-worker-options -A https://get.silverbullet.md
+          deno install -f --name silverbullet --global --unstable-kv --unstable-worker-options -A https://get.silverbullet.md
 
       - name: Build with Deno
         run: |
