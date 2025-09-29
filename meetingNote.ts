@@ -1,8 +1,12 @@
-import { editor, space, system } from "@silverbulletmd/silverbullet/syscalls";
+import {
+  editor,
+  space,
+  system,
+} from "jsr:@silverbulletmd/silverbullet/syscalls";
 import dayjs from "https://esm.sh/dayjs";
 import customParseFormat from "https://esm.sh/dayjs/plugin/customParseFormat.js";
 import isToday from "https://esm.sh/dayjs/plugin/isToday.js";
-import { z, ZodError } from "zod";
+import { z, ZodError } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 
 import {
   formatTimestamp,
@@ -59,7 +63,7 @@ async function showConfigErrorNotification(error: unknown) {
 }
 
 export async function getPlugConfig(): Promise<MeetingNoteConfig> {
-  const userConfig = await system.getSpaceConfig(PLUG_NAME, {});
+  const userConfig = await system.getConfig(PLUG_NAME, {});
 
   try {
     return meetingNoteConfigSchema.parse(userConfig || {});
