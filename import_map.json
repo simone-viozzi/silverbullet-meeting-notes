@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "@silverbulletmd/silverbullet": "jsr:@silverbulletmd/silverbullet@^2.1.5",
+    "$sb/": "https://deno.land/x/silverbullet@0.10.4/plug-api/",
+    "$common/": "https://deno.land/x/silverbullet@0.10.4/common/",
+    "$date-fns/": "https://deno.land/x/date_fns/",
+    "zod": "https://deno.land/x/zod@v3.23.8/mod.ts",
+    "dayjs": "https://esm.sh/dayjs",
+    "dayjs/plugin/customParseFormat": "https://esm.sh/dayjs/plugin/customParseFormat.js",
+    "dayjs/plugin/isToday": "https://esm.sh/dayjs/plugin/isToday.js"
+  }
+}

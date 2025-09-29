@@ -3,10 +3,10 @@ import {
   space,
   system,
 } from "jsr:@silverbulletmd/silverbullet/syscalls";
-import dayjs from "https://esm.sh/dayjs";
-import customParseFormat from "https://esm.sh/dayjs/plugin/customParseFormat.js";
-import isToday from "https://esm.sh/dayjs/plugin/isToday.js";
-import { z, ZodError } from "https://deno.land/x/zod@v3.23.8/mod.ts";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import isToday from "dayjs/plugin/isToday";
+import { z, ZodError } from "zod";
 
 import {
   formatTimestamp,

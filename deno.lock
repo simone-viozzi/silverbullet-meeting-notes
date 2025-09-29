@@ -1,6 +1,7 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@silverbulletmd/silverbullet@*": "2.1.5",
     "jsr:@silverbulletmd/silverbullet@^2.1.5": "2.1.5"
   },
   "jsr": {
