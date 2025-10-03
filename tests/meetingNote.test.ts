@@ -12,6 +12,47 @@ import isToday from "dayjs/plugin/isToday";
 dayjs.extend(customParseFormat);
 dayjs.extend(isToday);
 
+// Tests for forward prefix stripping
+Deno.test("sanitizeTitle strips Fw: prefix", () => {
+  assertEquals(sanitizeTitle("Fw: Meeting with team"), "Meeting with team");
+});
+
+Deno.test("sanitizeTitle strips FW: prefix", () => {
+  assertEquals(sanitizeTitle("FW: Project Update"), "Project Update");
+});
+
+Deno.test("sanitizeTitle strips Fwd: prefix", () => {
+  assertEquals(sanitizeTitle("Fwd: Budget Review"), "Budget Review");
+});
+
+Deno.test("sanitizeTitle strips FWD: prefix", () => {
+  assertEquals(sanitizeTitle("FWD: Team Sync"), "Team Sync");
+});
+
+Deno.test("sanitizeTitle strips fwd: prefix (lowercase)", () => {
+  assertEquals(sanitizeTitle("fwd: daily standup"), "daily standup");
+});
+
+Deno.test("sanitizeTitle strips Re: prefix", () => {
+  assertEquals(sanitizeTitle("Re: Follow up meeting"), "Follow up meeting");
+});
+
+Deno.test("sanitizeTitle strips RE: prefix", () => {
+  assertEquals(sanitizeTitle("RE: Important Discussion"), "Important Discussion");
+});
+
+Deno.test("sanitizeTitle strips prefix with extra spaces", () => {
+  assertEquals(sanitizeTitle("Fw:    Meeting Notes"), "Meeting Notes");
+});
+
+Deno.test("sanitizeTitle strips prefix with leading spaces", () => {
+  assertEquals(sanitizeTitle("  Fw: Meeting"), "Meeting");
+});
+
+Deno.test("sanitizeTitle handles Fw: with special characters", () => {
+  assertEquals(sanitizeTitle("Fw: [Team] Meeting@10"), "Team - Meeting-10");
+});
+
 Deno.test("sanitizeTitle with special characters and consecutive hyphens", () => {
   assertEquals(sanitizeTitle("--[tag]++meeting1=="), "tag - meeting1");
 });
