@@ -7,29 +7,35 @@ dayjs.extend(isToday);
 
 /**
  * Sanitizes a given title by applying a series of formatting rules to ensure consistency.
- * This includes replacing special characters with hyphens, collapsing multiple hyphens into a single hyphen,
+ * This includes stripping common forward prefixes (Fw:, FW:, Fwd:, FWD:, Re:, RE:),
+ * replacing special characters with hyphens, collapsing multiple hyphens into a single hyphen,
  * ensuring hyphens are surrounded by spaces, and collapsing multiple spaces into a single space.
  * Leading and trailing spaces or hyphens are removed.
  *
  * @param title - The title string to be sanitized.
- * @returns The sanitized title, with special characters and consecutive hyphens replaced by a single hyphen,
- *          excess spaces removed, and hyphens properly spaced.
+ * @returns The sanitized title, with forward prefixes and special characters removed,
+ *          consecutive hyphens replaced by a single hyphen, excess spaces removed, and hyphens properly spaced.
  *
  * Example usage:
- *   sanitizeTitle("--tag ++meeting1==")  // Returns: "tag  - meeting1"
- *   sanitizeTitle("[tag]  meeting1")     // Returns: "tag - meeting1"
- *   sanitizeTitle("[tag]|meeting1")      // Returns: "tag - meeting1"
- *   sanitizeTitle("tag    meeting1")     // Returns: "tag meeting1"
- *   sanitizeTitle("tag-meeting1")        // Returns: "tag - meeting1"
- *   sanitizeTitle("tag:meeting1")        // Returns: "tag - meeting1"
- *   sanitizeTitle("  tag meeting1  ")    // Returns: "tag meeting1"
- *   sanitizeTitle("tag@meeting1")        // Returns: "tag - meeting1"
- *   sanitizeTitle("tag#meeting1")        // Returns: "tag - meeting1"
- *   sanitizeTitle("tag&meeting1")        // Returns: "tag - meeting1"
+ *   sanitizeTitle("Fw: Meeting with team")  // Returns: "Meeting with team"
+ *   sanitizeTitle("FWD: Project Update")    // Returns: "Project Update"
+ *   sanitizeTitle("--tag ++meeting1==")     // Returns: "tag  - meeting1"
+ *   sanitizeTitle("[tag]  meeting1")        // Returns: "tag - meeting1"
+ *   sanitizeTitle("[tag]|meeting1")         // Returns: "tag - meeting1"
+ *   sanitizeTitle("tag    meeting1")        // Returns: "tag meeting1"
+ *   sanitizeTitle("tag-meeting1")           // Returns: "tag - meeting1"
+ *   sanitizeTitle("tag:meeting1")           // Returns: "tag - meeting1"
+ *   sanitizeTitle("  tag meeting1  ")       // Returns: "tag meeting1"
+ *   sanitizeTitle("tag@meeting1")           // Returns: "tag - meeting1"
+ *   sanitizeTitle("tag#meeting1")           // Returns: "tag - meeting1"
+ *   sanitizeTitle("tag&meeting1")           // Returns: "tag - meeting1"
  */
 export function sanitizeTitle(title: string): string {
   // console.log("Sanitizing title:", title);
-  let sanitized = title.replace(/[^a-zA-Z0-9\s]/g, "-");
+  // Strip common forward prefixes (Fw:, FW:, Fwd:, FWD:, etc.)
+  let sanitized = title.replace(/^\s*(fw|fwd|re):\s*/gi, "");
+  // console.log("Step 0 (strip forward prefixes):", sanitized);
+  sanitized = sanitized.replace(/[^a-zA-Z0-9\s]/g, "-");
   // console.log("Step 1:", sanitized);
   sanitized = sanitized.replace(/^[\s-]+|[\s-]+$/g, "");
   // console.log("Step 2:", sanitized);
