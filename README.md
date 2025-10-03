@@ -5,7 +5,7 @@ This SilverBullet plug-in facilitates the creation of meeting notes from a templ
 ## Features
 
 - **Dynamic Date Parsing**: Supports flexible date and time formats, intelligently adjusting to future dates if the entered time has already passed.
-- **Title Sanitization**: Removes special characters and excessive spaces from meeting titles, ensuring valid and clean file names.
+- **Title Sanitization**: Removes special characters and excessive spaces from meeting titles, ensuring valid and clean file names. Automatically strips common forward prefixes (Fw:, FW:, Fwd:, FWD:, Re:, RE:) from forwarded meeting invitations.
 - **Configuration Validation**: Validates user settings against a schema to ensure necessary configurations are in place, enhancing reliability.
 - **Error Handling**: Offers descriptive error messages for various failure scenarios, including configuration errors and input validation failures.
 
@@ -47,15 +47,16 @@ Assuming today is 2024-03-27_14-00, and the meeting title is "meeting":
 
 Assuming today is 2024-03-27_14-00:
 
-1. `meetingNote("10 Team Meeting @ 10:00")` -> `2024-03-28_10-00 - Team Meeting - 10 - 00` When the title "Team Meeting @ 10:00" undergoes sanitization, the script replaces special characters like "@" with hyphens and ensures that these hyphens are surrounded by spaces if not already. Therefore, the sanitized title becomes "Team Meeting - 10:00". It's important to note that the script does not include the "10" at the beginning in the title; it represents part of the date input and is not involved in the title sanitization process. Hence, the correct format after parsing the date and sanitizing the title would be `2024-03-28_10-00 - Team Meeting - 10 - 00`.
-2. `meetingNote("10 Project---Kickoff")` -> `2024-03-28_10-00 - Project - Kickoff` because consecutive hyphens are collapsed into a single hyphen.
-3. `meetingNote("10  Strategy & Planning  ")` -> `2024-03-28_10-00 - Strategy - Planning` The input title "Strategy & Planning" will be processed by the script to replace special characters and symbols with hyphens and to remove any leading or trailing spaces. The ampersand ("&") is a special character and is thus replaced with a hyphen. However, the script also collapses multiple spaces and hyphens into single instances and ensures proper spacing around hyphens. As a result, the sanitized title is "Strategy - Planning", demonstrating the script's approach to creating clean and consistent titles suitable for filenames or note titles.
-4. `meetingNote("10 Budget_Review|2024")` -> `2024-03-28_10-00 - Budget - Review - 2024` because underscores and vertical bars are replaced with hyphens.
-5. `meetingNote("10 Q4#Sales>Results")` -> `2024-03-28_10-00 - Q4 - Sales - Results` bIn the case of "Q4#Sales>Results", the title sanitization process involves replacing both the hash ("#") and the greater-than sign (">") with hyphens, as these are considered special characters according to the script's logic. Moreover, the script ensures that these replacements result in only single instances of hyphens and that there are no consecutive hyphens. Therefore, after sanitization, the title becomes "Q4 - Sales - Results".
-6. `meetingNote("10 EndOfYear!Celebration")` -> `2024-03-28_10-00 - EndOfYear - Celebration` because exclamation marks are replaced with hyphens.
-7. `meetingNote("10 New--Product Launch++")` -> `2024-03-28_10-00 - New - Product Launch` because extra hyphens and pluses are removed for clarity.
-8. `meetingNote("10 Client:Feedback Session")` -> `2024-03-28_10-00 - Client - Feedback Session` because colons are replaced with hyphens.
-9. `meetingNote("10 Quarterly Review/2024")` -> `2024-03-28_10-00 - Quarterly Review - 2024`
+1. `meetingNote("10 Fw: Team Meeting")` -> `2024-03-28_10-00 - Team Meeting` Forward prefixes like "Fw:", "FW:", "Fwd:", "FWD:", "Re:", and "RE:" are automatically stripped from the title, regardless of case.
+2. `meetingNote("10 Team Meeting @ 10:00")` -> `2024-03-28_10-00 - Team Meeting - 10 - 00` When the title "Team Meeting @ 10:00" undergoes sanitization, the script replaces special characters like "@" with hyphens and ensures that these hyphens are surrounded by spaces if not already. Therefore, the sanitized title becomes "Team Meeting - 10:00". It's important to note that the script does not include the "10" at the beginning in the title; it represents part of the date input and is not involved in the title sanitization process. Hence, the correct format after parsing the date and sanitizing the title would be `2024-03-28_10-00 - Team Meeting - 10 - 00`.
+3. `meetingNote("10 Project---Kickoff")` -> `2024-03-28_10-00 - Project - Kickoff` because consecutive hyphens are collapsed into a single hyphen.
+4. `meetingNote("10  Strategy & Planning  ")` -> `2024-03-28_10-00 - Strategy - Planning` The input title "Strategy & Planning" will be processed by the script to replace special characters and symbols with hyphens and to remove any leading or trailing spaces. The ampersand ("&") is a special character and is thus replaced with a hyphen. However, the script also collapses multiple spaces and hyphens into single instances and ensures proper spacing around hyphens. As a result, the sanitized title is "Strategy - Planning", demonstrating the script's approach to creating clean and consistent titles suitable for filenames or note titles.
+5. `meetingNote("10 Budget_Review|2024")` -> `2024-03-28_10-00 - Budget - Review - 2024` because underscores and vertical bars are replaced with hyphens.
+6. `meetingNote("10 Q4#Sales>Results")` -> `2024-03-28_10-00 - Q4 - Sales - Results` bIn the case of "Q4#Sales>Results", the title sanitization process involves replacing both the hash ("#") and the greater-than sign (">") with hyphens, as these are considered special characters according to the script's logic. Moreover, the script ensures that these replacements result in only single instances of hyphens and that there are no consecutive hyphens. Therefore, after sanitization, the title becomes "Q4 - Sales - Results".
+7. `meetingNote("10 EndOfYear!Celebration")` -> `2024-03-28_10-00 - EndOfYear - Celebration` because exclamation marks are replaced with hyphens.
+8. `meetingNote("10 New--Product Launch++")` -> `2024-03-28_10-00 - New - Product Launch` because extra hyphens and pluses are removed for clarity.
+9. `meetingNote("10 Client:Feedback Session")` -> `2024-03-28_10-00 - Client - Feedback Session` because colons are replaced with hyphens.
+10. `meetingNote("10 Quarterly Review/2024")` -> `2024-03-28_10-00 - Quarterly Review - 2024`
 
 
 ## Note
