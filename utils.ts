@@ -33,7 +33,7 @@ dayjs.extend(isToday);
 export function sanitizeTitle(title: string): string {
   // console.log("Sanitizing title:", title);
   // Strip common forward prefixes (Fw:, FW:, Fwd:, FWD:, etc.)
-  let sanitized = title.replace(/^\s*(fw|fwd|re):\s*/gi, "");
+  let sanitized = title.replace(/^\s*(fw|fwd|re)\s*:\s*/gi, "");
   // console.log("Step 0 (strip forward prefixes):", sanitized);
   sanitized = sanitized.replace(/[^a-zA-Z0-9\s]/g, "-");
   // console.log("Step 1:", sanitized);
