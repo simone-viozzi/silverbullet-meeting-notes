@@ -17,6 +17,14 @@ Deno.test("sanitizeTitle strips Fw: prefix", () => {
   assertEquals(sanitizeTitle("Fw: Meeting with team"), "Meeting with team");
 });
 
+Deno.test("sanitizeTitle strips Fw: with space before colon", () => {
+  assertEquals(sanitizeTitle("Fw : Meeting with team"), "Meeting with team");
+});
+
+Deno.test("sanitizeTitle strips Fw: with multiple spaces before colon", () => {
+  assertEquals(sanitizeTitle("Fw  : Meeting with team"), "Meeting with team");
+});
+
 Deno.test("sanitizeTitle strips FW: prefix", () => {
   assertEquals(sanitizeTitle("FW: Project Update"), "Project Update");
 });
@@ -51,6 +59,14 @@ Deno.test("sanitizeTitle strips prefix with leading spaces", () => {
 
 Deno.test("sanitizeTitle handles Fw: with special characters", () => {
   assertEquals(sanitizeTitle("Fw: [Team] Meeting@10"), "Team - Meeting-10");
+});
+
+Deno.test("sanitizeTitle strips Fw: from issue example", () => {
+  assertEquals(sanitizeTitle("Fw: In-Meeting - Planning"), "In-Meeting - Planning");
+});
+
+Deno.test("sanitizeTitle strips Fw : (with space) from issue example", () => {
+  assertEquals(sanitizeTitle("Fw : In-Meeting - Planning"), "In-Meeting - Planning");
 });
 
 Deno.test("sanitizeTitle with special characters and consecutive hyphens", () => {
